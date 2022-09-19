@@ -18,83 +18,41 @@
     - name: Get Certificates
       fetch:
         src: /root/ca.pem
-        dest: /tmp/fetched/ca.pem
+        dest: /ansible/ca.pem
+        flat: yes
       when: inventory_hostname in groups['HAproxy']
     - name: Get Certificates
       fetch:
         src: /root/kubernetes.pem
-        dest: /tmp/fetched/kubernetes.pem
+        dest: /ansible/kubernetes.pem
+        flat: yes
       when: inventory_hostname in groups['HAproxy']
     - name: Get Certificates
       fetch:
         src: /root/kubernetes-key.pem
-        dest: /tmp/fetched/kubernetes-key.pem
+        dest: /ansible/kubernetes-key.pem
+        flat: yes
       when: inventory_hostname in groups['HAproxy']
     - name: Copy Certificates to Masters
       become: true 
       copy:
-        src: /tmp/fetched/ca.pem
-        dest: /root/ca.pem
+        src: /ansible/ca.pem
+        dest: /root/
       when: inventory_hostname in groups['master']
     - name: Copy Certificates to Masters
       become: true 
       copy:
-        src: /tmp/fetched/kubernetes.pem
-        dest: /root/kubernetes.pem
+        src: /ansible/kubernetes.pem
+        dest: /root/
       when: inventory_hostname in groups['master']
     - name: Copy Certificates to Masters
       become: true 
       copy:
-        src: /tmp/fetched/kubernetes-key.pem
-        dest: /root/kubernetes-key.pem
+        src: /ansible/kubernetes-key.pem
+        dest: /root/
       when: inventory_hostname in groups['master']
     - name: Need Restart Set Auto
       shell: sed -i "s/#\$nrconf{restart} \= 'i';/\$nrconf{restart} \= 'a';/g" /etc/needrestart/needrestart.conf   
-    - name: Disable swap and add kernel settings
-      shell: |
-              swapoff -a
-              sed -e '/swap/ s/^#*/#/' -i /etc/fstab
-              systemctl mask swap.target
-              tee /etc/modules-load.d/containerd.conf <<EOF
-              overlay
-              br_netfilter
-              EOF
-              modprobe overlay
-              modprobe br_netfilter
-              tee /etc/sysctl.d/kubernetes.conf <<EOF
-              net.bridge.bridge-nf-call-ip6tables = 1
-              net.bridge.bridge-nf-call-iptables = 1
-              net.ipv4.ip_forward = 1
-              EOF
-              sysctl --system
-    - name: Install containerd runtime
-      shell: |
-              apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
-              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-              sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-              apt update
-              apt install -y containerd.io
-              containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
-              sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
-              systemctl restart containerd
-              systemctl enable containerd
-    - name: Crictl Install
-      shell: |
-              VERSION="v1.24.1"
-              curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-${VERSION}-linux-amd64.tar.gz --output crictl-${VERSION}-linux-amd64.tar.gz
-              tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
-              rm -f crictl-$VERSION-linux-amd64.tar.gz
-              crictl config runtime-endpoint unix:///run/containerd/containerd.sock                                                          
-              crictl config image-endpoint unix:///run/containerd/containerd.sock 
-    - name: Add apt repository for Kubernetes
-      shell: |
-              curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-              apt-add-repository -y "deb http://apt.kubernetes.io/ kubernetes-xenial main"
-    - name: Install Kubernetes components Kubectl kubeadm and kubelet
-      shell: |
-              apt update
-              apt install -y kubelet kubeadm kubectl
-              systemctl enable kubelet
     - name: Install Bash Completion
       shell: |
               apt-get install bash-completion
