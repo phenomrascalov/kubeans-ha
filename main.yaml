@@ -1,0 +1,144 @@
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Init HAproxy Server Install Script
+      shell: /ansible/init.sh             
+      delegate_to: 127.0.0.1
+    - name: Copy Install script to HAproxy Server
+      become: true 
+      copy:
+        src: /ansible/install.sh
+        dest: /root/install.sh
+      when: inventory_hostname in groups['HAproxy']
+    - name: Install HAproxy Server
+      shell: |
+        chmod +x /root/install.sh
+        /root/install.sh 
+      when: inventory_hostname in groups['HAproxy']
+    - name: Get Certificates
+      fetch:
+        src: /root/ca.pem
+        dest: /tmp/fetched/ca.pem
+      when: inventory_hostname in groups['HAproxy']
+    - name: Get Certificates
+      fetch:
+        src: /root/kubernetes.pem
+        dest: /tmp/fetched/kubernetes.pem
+      when: inventory_hostname in groups['HAproxy']
+    - name: Get Certificates
+      fetch:
+        src: /root/kubernetes-key.pem
+        dest: /tmp/fetched/kubernetes-key.pem
+      when: inventory_hostname in groups['HAproxy']
+    - name: Copy Certificates to Masters
+      become: true 
+      copy:
+        src: /tmp/fetched/ca.pem
+        dest: /root/ca.pem
+      when: inventory_hostname in groups['master']
+    - name: Copy Certificates to Masters
+      become: true 
+      copy:
+        src: /tmp/fetched/kubernetes.pem
+        dest: /root/kubernetes.pem
+      when: inventory_hostname in groups['master']
+    - name: Copy Certificates to Masters
+      become: true 
+      copy:
+        src: /tmp/fetched/kubernetes-key.pem
+        dest: /root/kubernetes-key.pem
+      when: inventory_hostname in groups['master']
+    - name: Need Restart Set Auto
+      shell: sed -i "s/#\$nrconf{restart} \= 'i';/\$nrconf{restart} \= 'a';/g" /etc/needrestart/needrestart.conf   
+    - name: Disable swap and add kernel settings
+      shell: |
+              swapoff -a
+              sed -e '/swap/ s/^#*/#/' -i /etc/fstab
+              systemctl mask swap.target
+              tee /etc/modules-load.d/containerd.conf <<EOF
+              overlay
+              br_netfilter
+              EOF
+              modprobe overlay
+              modprobe br_netfilter
+              tee /etc/sysctl.d/kubernetes.conf <<EOF
+              net.bridge.bridge-nf-call-ip6tables = 1
+              net.bridge.bridge-nf-call-iptables = 1
+              net.ipv4.ip_forward = 1
+              EOF
+              sysctl --system
+    - name: Install containerd runtime
+      shell: |
+              apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+              sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+              apt update
+              apt install -y containerd.io
+              containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+              sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+              systemctl restart containerd
+              systemctl enable containerd
+    - name: Crictl Install
+      shell: |
+              VERSION="v1.24.1"
+              curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-${VERSION}-linux-amd64.tar.gz --output crictl-${VERSION}-linux-amd64.tar.gz
+              tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
+              rm -f crictl-$VERSION-linux-amd64.tar.gz
+              crictl config runtime-endpoint unix:///run/containerd/containerd.sock                                                          
+              crictl config image-endpoint unix:///run/containerd/containerd.sock 
+    - name: Add apt repository for Kubernetes
+      shell: |
+              curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+              apt-add-repository -y "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+    - name: Install Kubernetes components Kubectl kubeadm and kubelet
+      shell: |
+              apt update
+              apt install -y kubelet kubeadm kubectl
+              systemctl enable kubelet
+    - name: Install Bash Completion
+      shell: |
+              apt-get install bash-completion
+              source /usr/share/bash-completion/bash_completion
+              kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl > /dev/null
+              echo 'alias k=kubectl' >>~/.bashrc
+              echo 'complete -o default -F __start_kubectl k' >>~/.bashrc              
+      when: inventory_hostname in groups['HAproxy']
+    - name: Init HAproxy Server Install Script
+      shell: /ansible/init_etcd.sh             
+      delegate_to: 127.0.0.1
+    - name: Copy Install script to Masters Server
+      become: true 
+      copy:
+        src: /ansible/install_etcd_master1.sh
+        dest: /root/install_etcd.sh
+      when: inventory_hostname in groups['master1']
+    - name: Copy Install script to Masters Server
+      become: true 
+      copy:
+        src: /ansible/install_etcd_master2.sh
+        dest: /root/install_etcd.sh
+      when: inventory_hostname in groups['master2']
+    - name: Copy Install script to Masters Server
+      become: true 
+      copy:
+        src: /ansible/install_etcd_master3.sh
+        dest: /root/install_etcd.sh
+      when: inventory_hostname in groups['master3']      
+    - name: Install ETCD to Masters Server
+      become: true 
+      shell: |
+        chmod +x /root/install_etcd.sh
+        /root/install_etcd.sh
+      when: inventory_hostname in groups['master1']
+    - name: Install ETCD to Masters Server
+      become: true 
+      shell: |
+        chmod +x /root/install_etcd.sh
+        /root/install_etcd.sh
+      when: inventory_hostname in groups['master2']
+    - name: Install ETCD to Masters Server
+      become: true 
+      shell: |
+        chmod +x /root/install_etcd.sh
+        /root/install_etcd.sh
+      when: inventory_hostname in groups['master3']
