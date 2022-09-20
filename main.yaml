@@ -21,6 +21,7 @@
         dest: /root/install_haproxy.sh
       when: inventory_hostname in groups['HAproxy']
     - name: Install HAproxy Server
+      become: true 
       shell: |
         chmod +x /root/install_haproxy.sh
         /root/install_haproxy.sh
