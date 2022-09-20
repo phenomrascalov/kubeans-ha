@@ -1,3 +1,4 @@
+#!/bin/bash
 sudo mkdir /etc/etcd /var/lib/etcd
 sudo mv /root/ca.pem /root/kubernetes.pem /root/kubernetes-key.pem /etc/etcd
 wget https://github.com/etcd-io/etcd/releases/download/v3.5.5/etcd-v3.5.5-linux-amd64.tar.gz
