@@ -5,7 +5,7 @@
       shell: sed -i "s/#\$nrconf{restart} \= 'i';/\$nrconf{restart} \= 'a';/g" /etc/needrestart/needrestart.conf
     - name: Install Bash Completion
       shell: |
-              apt-get install bash-completion
+              apt install bash-completion
               source /usr/share/bash-completion/bash_completion
               kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl > /dev/null
               echo 'alias k=kubectl' >>~/.bashrc
