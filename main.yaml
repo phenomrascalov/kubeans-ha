@@ -15,7 +15,7 @@
     - name: Install HAproxy Server
       shell: |
         chmod +x /root/install.sh
-        /root/install.sh 
+        /root/install.sh
       when: inventory_hostname in groups['HAproxy']
     - name: Get Certificates
       fetch:
@@ -91,16 +91,4 @@
       shell: |
         chmod +x /root/install_etcd.sh
         /root/install_etcd.sh
-      when: inventory_hostname in groups['master1']
-    - name: Install ETCD to Masters Server
-      become: true 
-      shell: |
-        chmod +x /root/install_etcd.sh
-        /root/install_etcd.sh
-      when: inventory_hostname in groups['master2']
-    - name: Install ETCD to Masters Server
-      become: true 
-      shell: |
-        chmod +x /root/install_etcd.sh
-        /root/install_etcd.sh
-      when: inventory_hostname in groups['master3']
+      when: inventory_hostname in groups['master']
