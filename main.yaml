@@ -41,7 +41,10 @@
       when: inventory_hostname in groups['HAproxy']
     - name: Start HAproxy Server
       become: true 
-      shell: systemctl restart haproxy
+      shell: |
+        echo "#" >> /etc/haproxy/haproxy.cfg
+        systemctl stop haproxy
+        systemctl start haproxy
       when: inventory_hostname in groups['HAproxy']
     - name: Copy Certificates to Masters
       copy:
