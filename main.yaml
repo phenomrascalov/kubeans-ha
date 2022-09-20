@@ -9,7 +9,7 @@
               source /usr/share/bash-completion/bash_completion
               kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl > /dev/null
               echo 'alias k=kubectl' >>~/.bashrc
-              echo 'complete -o default -F __start_kubectl k' >>~/.bashrc      
+              echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
     - name: Init Scripts
       shell: |
         chmod +x /ansible/init.sh
@@ -20,7 +20,7 @@
       shell: |
         cd /ansible/create_certs/
         chmod +x /ansible/create_certs/create_certs.sh
-        /ansible/create_certs/create_certs.sh           
+        /ansible/create_certs/create_certs.sh
       delegate_to: localhost
     - name: Install HAproxy Server
       become: true 
@@ -42,12 +42,12 @@
     - name: Start HAproxy Server
       become: true 
       shell: systemctl restart haproxy
-      when: inventory_hostname in groups['HAproxy']      
+      when: inventory_hostname in groups['HAproxy']
     - name: Copy Certificates to Masters
       copy:
         src: /ansible/create_certs/
         dest: /root/certs/
-      when: inventory_hostname in groups['master']    
+      when: inventory_hostname in groups['master']
     - name: Install ETCD to Masters Server
       become: true 
       shell: |
@@ -84,4 +84,4 @@
       copy:
         src: /ansible/config.yaml
         dest: /root/config.yaml
-      when: inventory_hostname in groups['master']     
+      when: inventory_hostname in groups['master']
