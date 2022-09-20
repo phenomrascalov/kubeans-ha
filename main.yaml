@@ -18,6 +18,7 @@
     - name: Create Certificates
       become: true
       shell: |
+        cd /ansible/create_certs/
         chmod +x /ansible/create_certs/create_certs.sh
         /ansible/create_certs/create_certs.sh           
       delegate_to: localhost      
