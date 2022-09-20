@@ -106,8 +106,7 @@
               net.ipv4.ip_forward = 1
               EOF
               sysctl --system
-      when: 
-        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker'] 
+      when: inventory_hostname in groups['master'] or inventory_hostname in groups['worker'] 
     - name: Install containerd runtime
       shell: |
               apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
@@ -119,8 +118,7 @@
               sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
               systemctl restart containerd
               systemctl enable containerd
-      when: 
-        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker']              
+      when: inventory_hostname in groups['master'] or inventory_hostname in groups['worker']              
     - name: Crictl Install
       shell: |
               VERSION="v1.24.1"
@@ -129,21 +127,18 @@
               rm -f crictl-$VERSION-linux-amd64.tar.gz
               crictl config runtime-endpoint unix:///run/containerd/containerd.sock                                                          
               crictl config image-endpoint unix:///run/containerd/containerd.sock
-      when: 
-        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker']             
+      when: inventory_hostname in groups['master'] or inventory_hostname in groups['worker']             
     - name: Add apt repository for Kubernetes
       shell: |
               curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
               apt-add-repository -y "deb http://apt.kubernetes.io/ kubernetes-xenial main"
-      when: 
-        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker']    
+      when: inventory_hostname in groups['master'] or inventory_hostname in groups['worker']    
     - name: Install Kubernetes components Kubectl kubeadm and kubelet
       shell: |
               apt update
               apt install -y kubelet kubeadm kubectl
               systemctl enable kubelet
-      when: 
-        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker']
+      when: inventory_hostname in groups['master'] or inventory_hostname in groups['worker']
     - name: Init First Kubernetes Master
       become: true
       shell: kubeadm init --config=/root/config.yaml 
@@ -160,3 +155,35 @@
         dest: /ansible/pki/
         flat: yes
       with_items: "{{ files_to_copy.files }}"
+- hosts: master1
+  gather_facts: no
+  tasks:
+    - name: Find Certificates to copy
+      find:
+        paths: "/etc/kubernetes/pki/"
+        recurse: yes
+      register: files_to_copy
+      when: inventory_hostname in groups['master1']
+    - name: Get Kubernetes Certificates
+      fetch:
+        src: "{{ item.path }}"
+        dest: /ansible/pki/
+        flat: yes
+      with_items: "{{ files_to_copy.files }}"
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Deleting Apiserver Certificates
+      shell: rm -rf /ansible/pki/apiserver.*
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Copy Certificates to other Masters
+      become: true 
+      copy:
+        src: /ansible/pki
+        dest: /etc/kubernetes/pki
+      when: inventory_hostname in groups['master2'] or inventory_hostname in groups['master3']
+    - name: Kubernetes Init Other Masters
+      shell: kubeadm init --config=config.yaml
+      when: inventory_hostname in groups['master2'] or inventory_hostname in groups['master3']       
