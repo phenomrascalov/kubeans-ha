@@ -142,4 +142,19 @@
               apt install -y kubelet kubeadm kubectl
               systemctl enable kubelet
       when: 
-        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker']      
+        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker']
+    - name: Copy Init Kubernetes Config
+      become: true 
+      copy:
+        src: /ansible/config.yaml
+        dest: /root/config.yaml
+      when: inventory_hostname in groups['master']
+    - name: Init First Kubernetes Master
+      shell: kubeadm init --config=/root/config.yaml 
+      when: inventory_hostname in groups['master1']
+    - name: Get Kubernetes Certificates
+      fetch:
+        src: /etc/kubernetes/pki
+        dest: /ansible/pki
+        flat: yes
+      when: inventory_hostname in groups['master1']        

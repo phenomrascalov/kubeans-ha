@@ -35,12 +35,12 @@ tee /root/ca-config.json <<EOF
 {
   "signing": {
     "default": {
-      "expiry": "876000h"
+      "expiry": "8760h"
     },
     "profiles": {
       "kubernetes": {
         "usages": ["signing", "key encipherment", "server auth", "client auth"],
-        "expiry": "876000h"
+        "expiry": "8760h"
       }
     }
   }
