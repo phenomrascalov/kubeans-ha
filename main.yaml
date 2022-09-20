@@ -106,8 +106,7 @@
               EOF
               sysctl --system
       when: 
-        - inventory_hostname in groups['master']
-        - inventory_hostname in groups['worker']
+        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker'] 
     - name: Install containerd runtime
       shell: |
               apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
