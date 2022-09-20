@@ -159,4 +159,4 @@
         src: "{{ item.path }}"
         dest: /ansible/pki/
         flat: yes
-      with_items: "{{ files_to_copy.files }}"     
+      with_items: "{{ files_to_copy.files }}"
