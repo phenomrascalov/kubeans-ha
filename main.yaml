@@ -19,7 +19,7 @@
       become: true
       shell: |
         chmod +x /ansible/create_certs/create_certs.sh
-        /ansible/init.sh             
+        /ansible/create_certs/create_certs.sh           
       delegate_to: localhost      
     - name: Copy Install script to HAproxy Server
       copy:
