@@ -21,12 +21,7 @@
         cd /ansible/create_certs/
         chmod +x /ansible/create_certs/create_certs.sh
         /ansible/create_certs/create_certs.sh           
-      delegate_to: localhost      
-    - name: Copy Install script to HAproxy Server
-      copy:
-        src: /ansible/install_haproxy.sh
-        dest: /root/install_haproxy.sh
-      when: inventory_hostname in groups['HAproxy']
+      delegate_to: localhost
     - name: Install HAproxy Server
       become: true 
       shell: |
