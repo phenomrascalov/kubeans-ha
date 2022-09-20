@@ -150,7 +150,7 @@
       when: inventory_hostname in groups['master1']
     - name: Get Kubernetes Certificates
       fetch:
-        src: /etc/kubernetes/pki
-        dest: /ansible/pki
+        src: /etc/kubernetes/pki/
+        dest: /ansible/pki/
         flat: yes
       when: inventory_hostname in groups['master1']         
