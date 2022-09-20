@@ -14,6 +14,6 @@ then
         sleep 1
         sed -i "s/$var/$ip/g" create_certs/create_certs.sh
         sleep 1
-        sed -i "s/$var/$ip/g" install_haproxy.sh	
+        sed -i "s/$var/$ip/g" haproxy.cfg	
 fi
 done < "servers"

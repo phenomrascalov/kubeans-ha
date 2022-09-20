@@ -3,9 +3,9 @@
 wget https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/linux/amd64/kubectl
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin
-sudo apt-get update -y 
-sudo apt-get upgrade -y
-sudo apt-get install haproxy -y
+sudo apt update -y 
+sudo apt upgrade -y
+sudo apt install haproxy -y
 tee /root/append <<EOF
 frontend kubernetes
 bind #haproxy#:6443

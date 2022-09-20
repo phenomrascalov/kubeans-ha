@@ -30,9 +30,24 @@
     - name: Install HAproxy Server
       become: true 
       shell: |
-        chmod +x /root/install_haproxy.sh
-        /root/install_haproxy.sh
+        wget https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/linux/amd64/kubectl
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin
+        apt update -y 
+        apt upgrade -y
+        apt install haproxy -y
+        systemctl enable haproxy
       when: inventory_hostname in groups['HAproxy']
+    - name: Copy Config HAproxy Server
+      become: true 
+      copy:
+        src: /ansible/haproxy.cfg
+        dest: /etc/haproxy/haproxy.cfg
+      when: inventory_hostname in groups['HAproxy']
+    - name: Start HAproxy Server
+      become: true 
+      shell: systemctl restart haproxy
+      when: inventory_hostname in groups['HAproxy']      
     - name: Copy Certificates to Masters
       copy:
         src: /ansible/create_certs/
