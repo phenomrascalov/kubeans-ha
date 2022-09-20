@@ -2,82 +2,45 @@
   gather_facts: no
   tasks:
     - name: Need Restart Set Auto
-      shell: sed -i "s/#\$nrconf{restart} \= 'i';/\$nrconf{restart} \= 'a';/g" /etc/needrestart/needrestart.conf  
-    - name: Init HAproxy Server Install Script
-      shell: |
-        chmod +x /ansible/init.sh
-        /ansible/init.sh             
-      delegate_to: 127.0.0.1
-    - name: Copy Install script to HAproxy Server
-      become: true 
-      copy:
-        src: /ansible/install.sh
-        dest: /root/install.sh
-      when: inventory_hostname in groups['HAproxy']
-    - name: Install HAproxy Server
-      shell: |
-        chmod +x /root/install.sh
-        /root/install.sh
-      when: inventory_hostname in groups['HAproxy']
-    - name: Get Certificates
-      fetch:
-        src: /root/ca.pem
-        dest: /ansible/ca.pem
-        flat: yes
-      when: inventory_hostname in groups['HAproxy']
-    - name: Get Certificates
-      fetch:
-        src: /root/kubernetes.pem
-        dest: /ansible/kubernetes.pem
-        flat: yes
-      when: inventory_hostname in groups['HAproxy']
-    - name: Get Certificates
-      fetch:
-        src: /root/kubernetes-key.pem
-        dest: /ansible/kubernetes-key.pem
-        flat: yes
-      when: inventory_hostname in groups['HAproxy']
-    - name: Copy Certificates to Masters
-      become: true 
-      copy:
-        src: /ansible/ca.pem
-        dest: /root/
-      when: inventory_hostname in groups['master']
-    - name: Copy Certificates to Masters
-      become: true 
-      copy:
-        src: /ansible/kubernetes.pem
-        dest: /root/
-      when: inventory_hostname in groups['master']
-    - name: Copy Certificates to Masters
-      become: true 
-      copy:
-        src: /ansible/kubernetes-key.pem
-        dest: /root/
-      when: inventory_hostname in groups['master']
-    - name: Need Restart Set Auto
-      shell: sed -i "s/#\$nrconf{restart} \= 'i';/\$nrconf{restart} \= 'a';/g" /etc/needrestart/needrestart.conf   
+      shell: sed -i "s/#\$nrconf{restart} \= 'i';/\$nrconf{restart} \= 'a';/g" /etc/needrestart/needrestart.conf
     - name: Install Bash Completion
       shell: |
               apt-get install bash-completion
               source /usr/share/bash-completion/bash_completion
               kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl > /dev/null
               echo 'alias k=kubectl' >>~/.bashrc
-              echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
+              echo 'complete -o default -F __start_kubectl k' >>~/.bashrc      
+    - name: Init Scripts
+      shell: |
+        chmod +x /ansible/init.sh
+        /ansible/init.sh             
+      delegate_to: localhost
+    - name: Copy Install script to HAproxy Server
+      copy:
+        src: /ansible/install_haproxy.sh
+        dest: /root/install_haproxy.sh
+      when: inventory_hostname in groups['HAproxy']
+    - name: Install HAproxy Server
+      shell: |
+        chmod +x /root/install_haproxy.sh
+        /root/install_haproxy.sh
+      when: inventory_hostname in groups['HAproxy']
+    - name: Copy Certificates to Masters
+      copy:
+        src: /ansible/create_certs/
+        dest: /root/certs/
+      when: inventory_hostname in groups['master']     
     - name: Copy Install script to Masters Server
-      become: true 
       copy:
         src: /ansible/install_etcd_master1.sh
         dest: /root/install_etcd.sh
       when: inventory_hostname in groups['master1']
     - name: Copy Install script to Masters Server
-      become: true 
       copy:
         src: /ansible/install_etcd_master2.sh
         dest: /root/install_etcd.sh
       when: inventory_hostname in groups['master2']
     - name: Copy Install script to Masters Server
-      become: true 
       copy:
         src: /ansible/install_etcd_master3.sh
         dest: /root/install_etcd.sh
@@ -150,6 +113,7 @@
         dest: /root/config.yaml
       when: inventory_hostname in groups['master']
     - name: Init First Kubernetes Master
+      become: true
       shell: kubeadm init --config=/root/config.yaml 
       when: inventory_hostname in groups['master1']
     - name: Get Kubernetes Certificates
