@@ -4,11 +4,11 @@ if [ ! -z "$var" ]
 then
         sed -i "s/$var/$ip/g" install.sh
         sleep 1
-        sed -i "s/$var/$ip/g" install_etcd_master1.sh
+        sed -i "s/$var/$ip/g" etcd_master1.service
         sleep 1
-        sed -i "s/$var/$ip/g" install_etcd_master2.sh
+        sed -i "s/$var/$ip/g" etcd_master2.service
         sleep 1
-        sed -i "s/$var/$ip/g" install_etcd_master3.sh
+        sed -i "s/$var/$ip/g" etcd_master3.service
         sleep 1
         sed -i "s/$var/$ip/g" config.yaml
         sleep 1
