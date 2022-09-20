@@ -9,5 +9,7 @@ then
         sed -i "s/$var/$ip/g" install_etcd_master2.sh
 		sleep 1
         sed -i "s/$var/$ip/g" install_etcd_master3.sh
+		sleep 1
+		sed -i "s/$var/$ip/g" config.yaml
 fi
 done < "servers"
