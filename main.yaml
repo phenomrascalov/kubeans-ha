@@ -120,8 +120,7 @@
               systemctl restart containerd
               systemctl enable containerd
       when: 
-        - inventory_hostname in groups['master']
-        - inventory_hostname in groups['worker']              
+        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker']              
     - name: Crictl Install
       shell: |
               VERSION="v1.24.1"
@@ -131,20 +130,17 @@
               crictl config runtime-endpoint unix:///run/containerd/containerd.sock                                                          
               crictl config image-endpoint unix:///run/containerd/containerd.sock
       when: 
-        - inventory_hostname in groups['master']
-        - inventory_hostname in groups['worker']              
+        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker']             
     - name: Add apt repository for Kubernetes
       shell: |
               curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
               apt-add-repository -y "deb http://apt.kubernetes.io/ kubernetes-xenial main"
       when: 
-        - inventory_hostname in groups['master']
-        - inventory_hostname in groups['worker']              
+        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker']    
     - name: Install Kubernetes components Kubectl kubeadm and kubelet
       shell: |
               apt update
               apt install -y kubelet kubeadm kubectl
               systemctl enable kubelet
       when: 
-        - inventory_hostname in groups['master']
-        - inventory_hostname in groups['worker']              
+        - inventory_hostname in groups['master'] or inventory_hostname in groups['worker']      
