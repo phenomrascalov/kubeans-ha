@@ -63,11 +63,6 @@
               echo 'alias k=kubectl' >>~/.bashrc
               echo 'complete -o default -F __start_kubectl k' >>~/.bashrc              
       when: inventory_hostname in groups['HAproxy']
-    - name: Init HAproxy Server Install Script
-      shell: |
-        chmod +x /ansible/init_etcd.sh
-        /ansible/init_etcd.sh             
-      delegate_to: 127.0.0.1
     - name: Copy Install script to Masters Server
       become: true 
       copy:
