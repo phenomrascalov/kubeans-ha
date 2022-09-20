@@ -22,9 +22,9 @@ backend kubernetes-master-nodes
 mode tcp
 balance roundrobin
 option tcp-check
-server master1 #master1:6443 check fall 3 rise 2
-server master2 #master2:6443 check fall 3 rise 2
-server master3 #master3:6443 check fall 3 rise 2
+server master1 master1:6443 check fall 3 rise 2
+server master2 master2:6443 check fall 3 rise 2
+server master3 master3:6443 check fall 3 rise 2
 EOF
 
 cat append >> /etc/haproxy/haproxy.cfg
@@ -90,6 +90,6 @@ cfssl gencert \
 -ca=ca.pem \
 -ca-key=ca-key.pem \
 -config=ca-config.json \
--hostname=#master1,#master2,#master3,#haproxy,127.0.0.1,kubernetes.default \
+-hostname=master1,master2,master3,haproxy,127.0.0.1,kubernetes.default \
 -profile=kubernetes kubernetes-csr.json | \
 cfssljson -bare kubernetes
