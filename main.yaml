@@ -2,7 +2,9 @@
   gather_facts: no
   tasks:
     - name: Init HAproxy Server Install Script
-      shell: /ansible/init.sh             
+      shell: |
+        chmod +x /ansible/init.sh
+        /ansible/init.sh             
       delegate_to: 127.0.0.1
     - name: Copy Install script to HAproxy Server
       become: true 
@@ -62,7 +64,9 @@
               echo 'complete -o default -F __start_kubectl k' >>~/.bashrc              
       when: inventory_hostname in groups['HAproxy']
     - name: Init HAproxy Server Install Script
-      shell: /ansible/init_etcd.sh             
+      shell: |
+        chmod +x /ansible/init_etcd.sh
+        /ansible/init_etcd.sh             
       delegate_to: 127.0.0.1
     - name: Copy Install script to Masters Server
       become: true 
