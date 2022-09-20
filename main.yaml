@@ -55,6 +55,7 @@
     - name: Install ETCD to Masters Server
       become: true 
       shell: |
+        rm -rf /etc/etcd
         mkdir /etc/etcd /var/lib/etcd
         mv /root/certs/ca.pem /root/certs/kubernetes.pem /root/certs/kubernetes-key.pem /etc/etcd
         wget https://github.com/etcd-io/etcd/releases/download/v3.5.5/etcd-v3.5.5-linux-amd64.tar.gz
