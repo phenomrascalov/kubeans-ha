@@ -174,4 +174,30 @@
       when: inventory_hostname in groups['master2'] or inventory_hostname in groups['master3']
     - name: Kubernetes Init Other Masters
       shell: kubeadm init --config=config.yaml
-      when: inventory_hostname in groups['master2'] or inventory_hostname in groups['master3']       
+      when: inventory_hostname in groups['master2'] or inventory_hostname in groups['master3']
+    - name: Add Permision Admin Conf
+      shell: chmod +r /etc/kubernetes/admin.conf
+      when: inventory_hostname in groups['master1']
+    - name: Get Admin Conf
+      fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: /ansible/admin.conf
+        flat: yes
+      when: inventory_hostname in groups['master1']
+    - name: Copy Admin Conf File to HAproxy Server
+      copy:
+        src: /ansible/admin.conf
+        dest: /root/admin.conf
+      when: inventory_hostname in groups['HAproxy']        
+    - name: HAproxy Settings
+      shell: |
+        mkdir /root/.kube
+        mv /root/admin.conf /root/.kube/config
+        chmod 600 /root/.kube/config
+      when: inventory_hostname in groups['HAproxy']
+    - name: Remove Permision Admin Conf
+      shell: chmod 600 /etc/kubernetes/admin.conf
+      when: inventory_hostname in groups['master1']      
+      
+      
+      
