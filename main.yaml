@@ -48,9 +48,8 @@
       when: inventory_hostname in groups['HAproxy']
     - name: Copy Certificates to Masters
       copy:
-        src: "{{ item }}"
+        src: /ansible/create_certs/
         dest: /root/certs/
-      with_fileglob: "/ansible/create_certs/*.pem"
       when: inventory_hostname in groups['master']
     - name: Install ETCD to Masters Server
       become: true 
@@ -81,7 +80,7 @@
       shell: |
         systemctl daemon-reload
         systemctl enable etcd
-        systemctl start etcd
+        systemctl restart etcd
         ETCDCTL_API=3 etcdctl member list
       when: inventory_hostname in groups['master']
     - name: Copy Init Kubernetes Config
