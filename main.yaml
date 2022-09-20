@@ -148,9 +148,15 @@
       become: true
       shell: kubeadm init --config=/root/config.yaml 
       when: inventory_hostname in groups['master1']
+    - name: Find Certificates to copy
+      find: 
+        paths: "/etc/kubernetes/pki/"
+        recurse: yes 
+      register: files_to_copy
+      when: inventory_hostname in groups['master1']
     - name: Get Kubernetes Certificates
-      fetch:
-        src: /etc/kubernetes/pki/
+      fetch: 
+        src: "{{ item.path }}"
         dest: /ansible/pki/
         flat: yes
-      when: inventory_hostname in groups['master1']         
+      with_items: "{{ files_to_copy.files }}"     
