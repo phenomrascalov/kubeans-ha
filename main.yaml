@@ -1,3 +1,16 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:              
+    - name: Init Scripts
+      shell: |
+        chmod +x /ansible/init.sh
+        /ansible/init.sh
+    - name: Create Certificates
+      become: true
+      shell: |
+        cd /ansible/create_certs/
+        chmod +x /ansible/create_certs/create_certs.sh
+        /ansible/create_certs/create_certs.sh        
 - hosts: all
   gather_facts: no
   tasks:
@@ -10,18 +23,6 @@
               kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl > /dev/null
               echo 'alias k=kubectl' >>~/.bashrc
               echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
-    - name: Init Scripts
-      shell: |
-        chmod +x /ansible/init.sh
-        /ansible/init.sh             
-      delegate_to: localhost
-    - name: Create Certificates
-      become: true
-      shell: |
-        cd /ansible/create_certs/
-        chmod +x /ansible/create_certs/create_certs.sh
-        /ansible/create_certs/create_certs.sh
-      delegate_to: localhost
     - name: Install HAproxy Server
       become: true 
       shell: |
