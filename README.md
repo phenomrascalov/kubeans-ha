@@ -15,9 +15,11 @@ Example:
 ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.10
 
 ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.11
+
 .
 .
 .
+
 ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.12
 
 Type the hostname of the master and worker servers into the inventory.yaml file.
