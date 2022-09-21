@@ -206,11 +206,16 @@
               curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
               chmod 700 get_helm.sh
               ./get_helm.sh
-      when: inventory_hostname in groups['master']               
+      when: inventory_hostname in groups['haproxy']               
     - name: Calico Install
       shell: |
               curl https://projectcalico.docs.tigera.io/manifests/calico.yaml -O
-              kubectl apply -f calico.yaml      
-      
-      
-      
+              kubectl apply -f calico.yaml
+      when: inventory_hostname in groups['haproxy']
+    - name: Install Ingress
+      shell: |
+              kubectl create namespace ingress-nginx
+              helm repo add nginx-stable https://helm.nginx.com/stable
+              helm repo update
+              helm install ingress-nginx  nginx-stable/nginx-ingress -n ingress-nginx       
+      when: inventory_hostname in groups['haproxy']      
