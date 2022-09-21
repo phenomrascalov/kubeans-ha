@@ -1,5 +1,16 @@
 This setup is suitable for Ubuntu 22.04 target servers.
 
+This setup is for HA kubernetes setup.
+
+Requirements: 
+
+* 3 Master servers 
+
+* 1 HAproxy server 
+
+* n workers
+
+
 Switch to kubeans-ha bash with command below.
 
 ``` docker run -it phenomrascalov/kubeans-ha:latest sh```
