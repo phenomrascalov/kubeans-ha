@@ -17,4 +17,3 @@ then
         sed -i "s/$var/$ip/g" haproxy.cfg	
 fi
 done < "servers"
-rm -rf servers
