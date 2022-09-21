@@ -2,27 +2,27 @@ This setup is suitable for Ubuntu 22.04 target servers.
 
 Switch to kubeans-ha bash with command below.
 
-docker run -it phenomrascalov/kubeans-ha:latest 
+``` docker run -it phenomrascalov/kubeans-ha:latest sh```
 
 Generate ssh public key and private key with command below.
 
-ssh-keygen
+``` ssh-keygen``` 
 
 Share ssh public key to master and worker servers with command below.
 
 Example:
 
-ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.10
+```ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.10```
 
-ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.11
-
-.
+```ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.11```
 
 .
 
 .
 
-ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.12
+.
+
+```ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.12```
 
 Type the hostname of the master and worker servers into the inventory.yaml file.
 
