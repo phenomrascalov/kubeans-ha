@@ -17,7 +17,9 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.10
 ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.11
 
 .
+
 .
+
 .
 
 ssh-copy-id -i ~/.ssh/id_rsa.pub root@10.10.10.12
