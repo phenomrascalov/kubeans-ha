@@ -1,6 +1,6 @@
 This setup is suitable for Ubuntu 22.04 target servers.
 
-Switch to kubeans:v1.24.3 sh shell with command below.
+Switch to kubeans-ha bash with command below.
 
 docker run -it phenomrascalov/kubeans-ha:latest 
 
