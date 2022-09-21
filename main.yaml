@@ -234,7 +234,7 @@
       when: inventory_hostname in groups['master1']
     - name: Edit join command
       shell: |
-        chmod +x /ansible/create_servers.sh
+        chmod +x /ansible/haip.sh
         /ansible/haip.sh      
     - name: Copy join command to Worker
       copy:
