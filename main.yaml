@@ -232,6 +232,10 @@
         dest: /ansible/join-command.sh
         flat: yes
       when: inventory_hostname in groups['master1']
+    - name: Edit join command
+      shell: |
+        chmod +x /ansible/create_servers.sh
+        /ansible/haip.sh      
     - name: Copy join command to Worker
       copy:
         src: /ansible/join-command.sh
