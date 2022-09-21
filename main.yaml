@@ -232,3 +232,12 @@
         dest: /ansible/join-command.sh
         flat: yes
       when: inventory_hostname in groups['master1']
+    - name: Copy join command to Worker
+      copy:
+        src: /ansible/join-command.sh
+        dest: /root/join-command.sh
+        mode: 0777
+      when: inventory_hostname in groups['worker']
+    - name: Join Worker to cluster
+      command: sh /root/join-command.sh
+      when: inventory_hostname in groups['worker']
