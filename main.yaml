@@ -235,7 +235,8 @@
     - name: Edit join command
       shell: |
         chmod +x /ansible/haip.sh
-        /ansible/haip.sh      
+        /ansible/haip.sh
+      delegate_to: localhost
     - name: Copy join command to Worker
       copy:
         src: /ansible/join-command.sh
