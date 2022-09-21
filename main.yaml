@@ -33,20 +33,20 @@
         apt upgrade -y
         apt install haproxy -y
         systemctl enable haproxy
-      when: inventory_hostname in groups['HAproxy']
+      when: inventory_hostname in groups['haproxy']
     - name: Copy Config HAproxy Server
       become: true 
       copy:
         src: /ansible/haproxy.cfg
         dest: /etc/haproxy/haproxy.cfg
-      when: inventory_hostname in groups['HAproxy']
+      when: inventory_hostname in groups['haproxy']
     - name: Start HAproxy Server
       become: true 
       shell: |
         echo "#" >> /etc/haproxy/haproxy.cfg
         systemctl stop haproxy
         systemctl start haproxy
-      when: inventory_hostname in groups['HAproxy']
+      when: inventory_hostname in groups['haproxy']
     - name: Copy Certificates to Masters
       copy:
         src: /ansible/create_certs/
@@ -189,13 +189,13 @@
       copy:
         src: /ansible/admin.conf
         dest: /root/admin.conf
-      when: inventory_hostname in groups['HAproxy']
+      when: inventory_hostname in groups['haproxy']
     - name: HAproxy Settings
       shell: |
         mkdir /root/.kube
         mv /root/admin.conf /root/.kube/config
         chmod 600 /root/.kube/config
-      when: inventory_hostname in groups['HAproxy']
+      when: inventory_hostname in groups['haproxy']
     - name: Remove Permision Admin Conf
       shell: chmod 600 /etc/kubernetes/admin.conf
       when: inventory_hostname in groups['master1']      
