@@ -1,9 +1,11 @@
 - hosts: localhost
   gather_facts: no
-  tasks:              
+  tasks: 
     - name: Init Scripts
       shell: |
+        chmod +x /ansible/create_servers.sh
         chmod +x /ansible/init.sh
+        /ansible/create_servers.sh
         /ansible/init.sh
     - name: Create Certificates
       become: true
